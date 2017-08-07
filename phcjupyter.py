@@ -10,6 +10,7 @@ class MySQLAuthenticator(Authenticator):
     @gen.coroutine
     def authenticate(self, handler, data):
         cfg = self.config.PHCHandler
+        print(cfg.keys())
         db = pymysql.connect(db=cfg.phc_db, host=cfg.phc_db_host)
 
         # db = pymysql.connect(read_default_file='.my.cnf', db='phcwebusers')
@@ -29,7 +30,7 @@ class MySQLAuthenticator(Authenticator):
                 uname = "_"+folder[0:30]
 
                 try:
-                    user = pwd.getpwnam(uname) # FIXME: handle (unlikely) collisions
+                    user = pwd.getpwnam(uname) # FIXME: handle rare collisions
                 except KeyError:
                     # create user if none exists
                     entrop = hex(random.getrandbits(128)) # random password, which su ignores
@@ -57,6 +58,7 @@ class MySQLAuthenticator(Authenticator):
             for u in files: os.chown(os.path.join(root, u), uid, gid)
 
         # add magics to sage
+        # FIXME: load from data_files
         base_st = os.path.normpath('/home/jupyterhub/startup')
         ipy_st = os.path.join(user.pw_dir,
                 ".sage/ipython-5.0.0/profile_default/startup")
